@@ -76,6 +76,7 @@ class Display
       if selected == false # grabbing a piece
         @selected = true
         @start = cursor
+        # call a method where the piece highlights the sqaures it's allowed to move to
       else #dropping a piece
         # when selected becomes false, call the board.move method passing in start and fin
         @selected = false

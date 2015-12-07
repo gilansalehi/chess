@@ -34,19 +34,19 @@ class Board
   def populate_board
     # setup black's back row
     grid[0].each_index do |i| # changed from each_with_index
-      self[[0,i]] = Piece.new(SETUP[i], :black)
+      self[[0,i]] = Piece.new(SETUP[i], :black, [0,i], self) # and position
     end
     # setup the black pawns
-   grid[1].each_index do |i|
-     grid[1][i] = Piece.new(:p, :black)
-   end
+  #  grid[1].each_index do |i|
+  #    grid[1][i] = Piece.new(:p, :black) # and position
+  #  end
     # setup white pawns
    grid[6].each_index do |i|
-     grid[6][i] = Piece.new(:p, :white)
+     grid[6][i] = Piece.new(:p, :white) # and position
    end
     # setup white pieces
    grid[7].each_index do |i| # changed from each_with_index
-     grid[7][i] = Piece.new(SETUP[i], :white)
+     grid[7][i] = Piece.new(SETUP[i], :white) # position
    end
   end
 
@@ -57,8 +57,15 @@ if __FILE__ == $PROGRAM_NAME
   board.populate_board
   test = Display.new(board)
   test.render
-  while true
-    test.get_input
-    test.render
-  end
+  board[[0,4]] = King.new(:K, :black, [0,4], board)
+  test.render
+  board[[0,1]] = Knight.new(:N, :black, [0,1], board)
+  print board[[0,4]].moves
+  puts
+  print board[[0,1]].moves
+
+  # while true
+  #   test.get_input
+  #   test.render
+  # end
 end
