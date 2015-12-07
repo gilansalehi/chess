@@ -1,10 +1,11 @@
 require 'colorize'
+require 'io/console'
 
 class Display
-  attr_accessor :board, :cursor, :selected, :grid
+  attr_accessor :board, :cursor, :selected, :grid, :start
 
   KEYMAP = {
-    " " => :select,
+    " " => :space,
     "w" => :up,
     "a" => :left,
     "s" => :down,
@@ -71,7 +72,15 @@ class Display
     when :ctrl_c
       exit 0
     when :space
-      selected ? @selected = false : @selected = true
+      # selected ? @selected = false : @selected = true
+      if selected == false # grabbing a piece
+        @selected = true
+        @start = cursor
+      else #dropping a piece
+        # when selected becomes false, call the board.move method passing in start and fin
+        @selected = false
+        board.move(start, cursor)
+      end
     when :left, :right, :up, :down
       update_pos(MOVES[key])
       # nil # why nil?
@@ -82,7 +91,7 @@ class Display
 
 
   def read_char
-    input = STDIN.getc
+    input = STDIN.getch
     # if input == "\e" then
     #   input << STDIN.read_nonblock(3) rescue nil
     #   input << STDIN.read_nonblock(2) rescue nil

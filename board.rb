@@ -23,12 +23,12 @@ class Board
   end
 
   def move(start, fin)
-    raise "no piece there" if grid[start].nil?
-    raise "invalid move" if #it's an invalid move!
+    # raise "no piece there" if self[start].nil?
+    # raise "invalid move" if #it's an invalid move!
 
-    selected_piece = grid[start]
-    grid[start] = nil
-    grid[fin] = selected_piece
+    selected_piece = self[start]
+    self[start] = nil
+    self[fin] = selected_piece
   end
 
   def populate_board
@@ -54,9 +54,11 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   board = Board.new()
-  puts board.grid
   board.populate_board
-  puts board.grid
   test = Display.new(board)
   test.render
+  while true
+    test.get_input
+    test.render
+  end
 end
