@@ -1,6 +1,6 @@
 require_relative 'board.rb'
 require_relative 'piece.rb'
-
+require_relative 'display'
 class Game
 
   attr_accessor
