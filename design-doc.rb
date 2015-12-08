@@ -9,6 +9,8 @@
 # Make sure pieces stay on board
 # TODO
 =begin
-populate board with actual piece instances.
 code game loop to take player moves w/ human players
+look for checks and checkmates.
 * maybe * modify display class to display legal moves for a selected piece
+
+code AI

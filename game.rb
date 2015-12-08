@@ -1,12 +1,14 @@
 require_relative 'board.rb'
 require_relative 'piece.rb'
 require_relative 'display'
+
 class Game
 
-  attr_accessor
+  attr_accessor :current_player
 
   def initialize
     @board = Board.new
+    @current_player = :white
     # game log, load pieces, etc.?
   end
 

@@ -1,5 +1,6 @@
 require_relative 'display'
 require_relative 'piece'
+require 'colorize'
 
 
 class Board
@@ -7,7 +8,7 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
-    # populate_board
+    populate_board
   end
 
   def[](pos)
@@ -20,13 +21,64 @@ class Board
     @grid[row][col] = mark
   end
 
-  def move(start, fin)
+  def move!(start, fin)
     # raise "no piece there" if self[start].nil?
     # raise "invalid move" if #it's an invalid move!
-
+    # selected_piece = self[start]
     selected_piece = self[start]
     self[start] = nil
     self[fin] = selected_piece
+    selected_piece.position = fin
+  end
+
+  def move(start, fin)
+    selected_piece = self[start]
+    if selected_piece.valid_moves.include?(fin)
+      self[start] = nil
+      self[fin] = selected_piece
+      selected_piece.position = fin
+    else
+      puts "Illegal Move!".red
+      sleep(2)
+    end
+  end
+
+  def in_check?(color)
+    # finds position of the King of the given color
+    pos = nil
+    grid.flatten.each do |square|
+      pos = square.position if square.is_a?(King) && square.color == color
+    end
+
+    #checks legal moves of enemy pieces to see if they contain the King's pos.
+    grid.flatten.compact.any? do |square|
+      return true if square.color != color && square.moves.include?(pos)
+    end
+    false
+  end
+
+  def checkmate?(color)
+    # checks each square for legal moves.  If none have legal moves, returns true
+    grid.flatten.compact.none? do |square|
+      square.color == color && (square.valid_moves.count > 0)
+    end
+  end
+
+  def deep_dup
+    duped_board = Board.new
+    (0..7).each do |row|
+      (0..7).each do |col|
+        square = self[[row, col]]
+        if square.nil?
+          duped_board[[row, col]] = nil
+          next
+        end
+        color = square.color
+        piece = square.class.new(color, [row,col], duped_board)
+        duped_board[[row, col]] = piece
+      end
+    end
+    duped_board
   end
 
   def populate_board
@@ -34,55 +86,46 @@ class Board
     row_of_pieces(7, :white)
     # setup black's back row
     grid[1].each_index do |i| # changed from each_with_index
-      grid[1][i] = BlackPawn.new(:p, :black, [1,i], self) # and position
+      grid[1][i] = BlackPawn.new(:black, [1,i], self) # and position
     end
     grid[6].each_index do |i|
-      grid[6][i] = WhitePawn.new(:p, :white, [6, i], self) # and position
+      grid[6][i] = WhitePawn.new(:white, [6, i], self) # and position
     end
   end
 
   def row_of_pieces(row, color)
-    grid[row][0] = Rook.new(:R, color, [row, 0], self)
-    grid[row][1] = Knight.new(:N, color, [row, 1], self)
-    grid[row][2] = Bishop.new(:B, color, [row, 2], self)
-    grid[row][3] = Queen.new(:Q, color, [row, 3], self)
-    grid[row][4] = King.new(:K, color, [row, 4], self)
-    grid[row][5] = Bishop.new(:B, color, [row, 5], self)
-    grid[row][6] = Knight.new(:N, color, [row, 6], self)
-    grid[row][7] = Rook.new(:R, color, [row, 7], self)
+    grid[row][0] = Rook.new(color, [row, 0], self)
+    grid[row][1] = Knight.new(color, [row, 1], self)
+    grid[row][2] = Bishop.new(color, [row, 2], self)
+    grid[row][3] = Queen.new(color, [row, 3], self)
+    grid[row][4] = King.new(color, [row, 4], self)
+    grid[row][5] = Bishop.new(color, [row, 5], self)
+    grid[row][6] = Knight.new(color, [row, 6], self)
+    grid[row][7] = Rook.new(color, [row, 7], self)
   end
 end
-
-if __FILE__ == $PROGRAM_NAME
-  board = Board.new()
-  board.populate_board
-  test = Display.new(board)
-  #
-  # board[[0,4]] = King.new(:K, :black, [0,4], board)
-  # board[[0,1]] = Knight.new(:N, :black, [0,1], board)
-  # board[[0,0]] = Rook.new(:R, :black, [0,0], board)
-  # board[[0,2]] = Bishop.new(:B, :black, [0,2], board)
-  # board[[0,3]] = Queen.new(:Q, :black, [0,3], board)
-  # print "King #{board[[0,4]].moves}"
-  # puts
-  # print "Knight #{board[[0,1]].moves}"
-  # puts
-  # print "Rook #{board[[0,0]].moves}"
-  # puts
-  # print "Bishop #{board[[0,2]].moves}"
-  # puts
-  # print "Queen #{board[[0,3]].moves}"
-  # board[[5,2]] = BlackPawn.new(:p, :black, [5,2], board)
-  # board[[1,3]] = BlackPawn.new(:p, :black, [1,3], board)
-  # board[[6,1]] = WhitePawn.new(:p, :white, [6,1], board)
-  test.render
-
-  board.grid.flatten.each do | square |
-    puts "#{square.class} : #{square.moves}" unless square.nil?
-  end
-
-  # while true
-  #   test.get_input
-  #   test.render
-  # end
-end
+#
+# if __FILE__ == $PROGRAM_NAME
+#   board = Board.new()
+#   board.populate_board
+#   test = Display.new(board)
+#   test.render
+#
+#   while true
+#     # test.get_input
+#     test.render
+#     board.grid.flatten.each do | square |
+#       puts "#{square.class} vmoves: #{square.valid_moves}" unless square.nil?
+#     end
+#     test.get_input
+#     if board.checkmate?(:black)
+#       puts "white wins "
+#       sleep(2)
+#     elsif board.checkmate?(:white)
+#       puts "black wins "
+#       sleep(2)
+#     end
+#   end
+#
+#
+# end

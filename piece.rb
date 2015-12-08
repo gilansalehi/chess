@@ -5,8 +5,7 @@ class Piece
 
   attr_accessor :symbol, :color, :position, :board, :move_directions
 
-  def initialize(symbol, color, position, board)
-    @symbol = symbol
+  def initialize(color, position, board)
     @color = color
     @position = position
     @board = board
@@ -21,6 +20,17 @@ class Piece
     when :white
       symbol.to_s.bold.red
     end
+  end
+
+  def valid_moves # rejects any move that puts self into check
+    moves.reject { |move| move_into_check?(move) }
+  end
+
+  def move_into_check?(destination)
+    # true if pieces move will result in putting self in check
+    deep_board = board.deep_dup
+    deep_board.move!(position, destination)
+    deep_board.in_check?(color)
   end
 
   def moves
@@ -76,8 +86,9 @@ end
 
 class King < SteppingPiece
 
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
+    @symbol = :K
     @move_directions = [
       [-1, 0],
       [-1, 1],
@@ -94,8 +105,9 @@ end
 
 class Knight < SteppingPiece
 
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
+    @symbol = :N
     @move_directions = [
       [-2, 1],
       [-1, 2],
@@ -114,8 +126,9 @@ end
 
 class Rook < SlidingPiece
 
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
+    @symbol = :R
     @move_directions = [
       [-1, 0],
       [0, 1],
@@ -128,8 +141,9 @@ end
 
 class Bishop < SlidingPiece
 
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
+    @symbol = :B
     @move_directions = [
       [-1, -1],
       [1, 1],
@@ -142,8 +156,9 @@ end
 
 class Queen < SlidingPiece
 
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
+    @symbol = :Q
     @move_directions = [
       [-1, 0],
       [0, 1],
@@ -159,7 +174,7 @@ class Queen < SlidingPiece
 end
 
 class Pawn < Piece
-  attr_reader :move, :capture
+  attr_reader :step, :capture
 
   def rough_moves
     legal_moves = []
@@ -170,7 +185,7 @@ class Pawn < Piece
   end
 
   def pawn_steps
-    [position[0] + move[0], position[1] + move[1]]
+    [position[0] + step[0], position[1] + step[1]]
   end
 
   def pawn_captures
@@ -189,9 +204,10 @@ class Pawn < Piece
 end
 
 class WhitePawn < Pawn
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
-    @move = [-1, 0]
+    @symbol = :p
+    @step = [-1, 0]
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[-1, 1], [-1, -1]]
     # promotion !!!! bonus
@@ -207,9 +223,10 @@ end
 
 class BlackPawn < Pawn
 
-  def initialize(symbol, color, position, board)
+  def initialize(color, position, board)
     super
-    @move = [1, 0]
+    @symbol = :p
+    @step = [1, 0]
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[1, 1], [1, -1]]
     # promotion !!!! bonus
