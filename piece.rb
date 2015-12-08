@@ -1,17 +1,18 @@
 require 'colorize'
+require 'byebug'
 
 class Piece
 
   attr_accessor :symbol, :color, :position, :board, :move_directions
 
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     @symbol = symbol
     @color = color
     @position = position
     @board = board
   end
 
-  def new_piece
+
 
   def to_s
     case color
@@ -48,7 +49,8 @@ class SlidingPiece < Piece
     @move_directions.each do | dir |
       last_position = position
       next_pos = [last_position[0] + dir[0], last_position[1] + dir[1]]
-      while board[next_pos].nil? && on_board?(next_pos) # write an on_board method
+      # debugger
+      while on_board?(next_pos) && board[next_pos].nil?  # write an on_board method
         legal_moves << next_pos
         last_position = next_pos
         next_pos = [last_position[0] + dir[0], last_position[1] + dir[1]]
@@ -74,7 +76,7 @@ end
 
 class King < SteppingPiece
 
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move_directions = [
       [-1, 0],
@@ -92,7 +94,7 @@ end
 
 class Knight < SteppingPiece
 
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move_directions = [
       [-2, 1],
@@ -112,7 +114,7 @@ end
 
 class Rook < SlidingPiece
 
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move_directions = [
       [-1, 0],
@@ -126,7 +128,7 @@ end
 
 class Bishop < SlidingPiece
 
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move_directions = [
       [-1, -1],
@@ -140,7 +142,7 @@ end
 
 class Queen < SlidingPiece
 
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move_directions = [
       [-1, 0],
@@ -180,17 +182,14 @@ class Pawn < Piece
     candidate_moves
   end
 
-
-
   def offset(position, delta)
     [position[0] + delta[0], position[1] + delta[1]]
   end
 
- # will migrate methods from black pawn
 end
 
 class WhitePawn < Pawn
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move = [-1, 0]
     #special method called "march", check if pawn is on row 1, if so
@@ -208,8 +207,7 @@ end
 
 class BlackPawn < Pawn
 
-
-  def initialize(symbol, color, position = nil, board = nil)
+  def initialize(symbol, color, position, board)
     super
     @move = [1, 0]
     #special method called "march", check if pawn is on row 1, if so
@@ -222,7 +220,5 @@ class BlackPawn < Pawn
       return offset(position, [2,0])
     end
   end
-
-
 
 end
