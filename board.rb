@@ -4,10 +4,11 @@ require 'colorize'
 
 
 class Board
-  attr_accessor :grid
+  attr_accessor :grid, :current_player
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
+    @current_player = "White"
     populate_board
   end
 
@@ -37,11 +38,21 @@ class Board
       self[start] = nil
       self[fin] = selected_piece
       selected_piece.position = fin
+      switch_player
     else
       puts "Illegal Move!".red
       sleep(2)
     end
   end
+
+  def switch_player
+    if current_player == "White"
+      @current_player = "Black"
+    elsif current_player == "Black"
+      @current_player = "White"
+    end
+  end
+
 
   def in_check?(color)
     # finds position of the King of the given color
@@ -104,28 +115,3 @@ class Board
     grid[row][7] = Rook.new(color, [row, 7], self)
   end
 end
-#
-# if __FILE__ == $PROGRAM_NAME
-#   board = Board.new()
-#   board.populate_board
-#   test = Display.new(board)
-#   test.render
-#
-#   while true
-#     # test.get_input
-#     test.render
-#     board.grid.flatten.each do | square |
-#       puts "#{square.class} vmoves: #{square.valid_moves}" unless square.nil?
-#     end
-#     test.get_input
-#     if board.checkmate?(:black)
-#       puts "white wins "
-#       sleep(2)
-#     elsif board.checkmate?(:white)
-#       puts "black wins "
-#       sleep(2)
-#     end
-#   end
-#
-#
-# end

@@ -16,9 +16,9 @@ class Piece
   def to_s
     case color
     when :black
-      symbol.to_s.bold.black
+      symbol.to_s.black
     when :white
-      symbol.to_s.bold.red
+      symbol.to_s.red
     end
   end
 
@@ -88,7 +88,7 @@ class King < SteppingPiece
 
   def initialize(color, position, board)
     super
-    @symbol = :K
+    @symbol = "\u265A"
     @move_directions = [
       [-1, 0],
       [-1, 1],
@@ -107,7 +107,7 @@ class Knight < SteppingPiece
 
   def initialize(color, position, board)
     super
-    @symbol = :N
+    @symbol = "\u265E"
     @move_directions = [
       [-2, 1],
       [-1, 2],
@@ -128,7 +128,7 @@ class Rook < SlidingPiece
 
   def initialize(color, position, board)
     super
-    @symbol = :R
+    @symbol = "\u265C"
     @move_directions = [
       [-1, 0],
       [0, 1],
@@ -143,7 +143,7 @@ class Bishop < SlidingPiece
 
   def initialize(color, position, board)
     super
-    @symbol = :B
+    @symbol = "\u265D"
     @move_directions = [
       [-1, -1],
       [1, 1],
@@ -158,7 +158,7 @@ class Queen < SlidingPiece
 
   def initialize(color, position, board)
     super
-    @symbol = :Q
+    @symbol = "\u265B"
     @move_directions = [
       [-1, 0],
       [0, 1],
@@ -206,7 +206,7 @@ end
 class WhitePawn < Pawn
   def initialize(color, position, board)
     super
-    @symbol = :p
+    @symbol = "\u265F"
     @step = [-1, 0]
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[-1, 1], [-1, -1]]
@@ -225,7 +225,7 @@ class BlackPawn < Pawn
 
   def initialize(color, position, board)
     super
-    @symbol = :p
+    @symbol = "\u265F"
     @step = [1, 0]
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[1, 1], [1, -1]]
