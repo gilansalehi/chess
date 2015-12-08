@@ -2,18 +2,7 @@ require 'colorize'
 
 class Piece
 
-  CARDINALS = {
-    N: [-1, 0],
-    NE: [-1, 1],
-    E: [0, 1],
-    SE: [1, 1],
-    S: [1, 0],
-    SW: [1, -1],
-    W: [0, -1],
-    NW: [-1, -1]
-  }
-
-  attr_accessor :symbol, :color, :position, :board, :my_moves
+  attr_accessor :symbol, :color, :position, :board, :move_directions
 
   def initialize(symbol, color, position = nil, board = nil)
     @symbol = symbol
@@ -21,6 +10,8 @@ class Piece
     @position = position
     @board = board
   end
+
+  def new_piece
 
   def to_s
     case color
@@ -45,17 +36,39 @@ class Piece
 
 end
 
-class SlidingPiece
+class SlidingPiece < Piece
 
+  def on_board?(pos)
+    pos.all? { |el| el < 8 && el >= 0 }
+  end
+
+  def rough_moves
+    legal_moves = []
+
+    @move_directions.each do | dir |
+      last_position = position
+      next_pos = [last_position[0] + dir[0], last_position[1] + dir[1]]
+      while board[next_pos].nil? && on_board?(next_pos) # write an on_board method
+        legal_moves << next_pos
+        last_position = next_pos
+        next_pos = [last_position[0] + dir[0], last_position[1] + dir[1]]
+      end
+      legal_moves << next_pos  # this covers capture but might include illegal
+      #moves---filter out in move method in Piece
+    end
+
+    legal_moves
+  end
 
 end
 
 class SteppingPiece < Piece
 
   def rough_moves
-    my_moves.map! do |dir| # takes current positions and returns array of adj positions
+    new_moves = move_directions.map do |dir| # takes current positions and returns array of adj positions
       [@position[0] + dir[0], @position[1] + dir[1]]
     end
+    new_moves
   end
 end
 
@@ -63,7 +76,7 @@ class King < SteppingPiece
 
   def initialize(symbol, color, position = nil, board = nil)
     super
-    @my_moves = [
+    @move_directions = [
       [-1, 0],
       [-1, 1],
       [0, 1],
@@ -75,23 +88,13 @@ class King < SteppingPiece
     ]
   end
 
-  #old_code
-  # @directions
-  #
-  #
-  # directions = []
-  #
-  # CARDINALS.each do |_, delta|
-  #   directions << delta
-  # end
-
 end
 
 class Knight < SteppingPiece
 
   def initialize(symbol, color, position = nil, board = nil)
     super
-    @my_moves = [
+    @move_directions = [
       [-2, 1],
       [-1, 2],
       [1, 2],
@@ -108,5 +111,118 @@ end
 
 
 class Rook < SlidingPiece
+
+  def initialize(symbol, color, position = nil, board = nil)
+    super
+    @move_directions = [
+      [-1, 0],
+      [0, 1],
+      [1, 0],
+      [0, -1]
+    ]
+  end
+
+end
+
+class Bishop < SlidingPiece
+
+  def initialize(symbol, color, position = nil, board = nil)
+    super
+    @move_directions = [
+      [-1, -1],
+      [1, 1],
+      [1, -1],
+      [-1, 1]
+    ]
+  end
+
+end
+
+class Queen < SlidingPiece
+
+  def initialize(symbol, color, position = nil, board = nil)
+    super
+    @move_directions = [
+      [-1, 0],
+      [0, 1],
+      [1, 0],
+      [0, -1],
+      [-1, -1],
+      [1, 1],
+      [1, -1],
+      [-1, 1]
+    ]
+  end
+
+end
+
+class Pawn < Piece
+  attr_reader :move, :capture
+
+  def rough_moves
+    legal_moves = []
+    legal_moves << pawn_steps if board[pawn_steps].nil?
+    legal_moves << march unless march.nil?
+    legal_moves.concat(pawn_captures)
+    legal_moves
+  end
+
+  def pawn_steps
+    [position[0] + move[0], position[1] + move[1]]
+  end
+
+  def pawn_captures
+    candidate_moves = []
+    capture.each  do |dir|
+      new_pos = [position[0] + dir[0], position[1] + dir[1]]
+      candidate_moves << new_pos unless board[new_pos].nil?
+    end
+    candidate_moves
+  end
+
+
+
+  def offset(position, delta)
+    [position[0] + delta[0], position[1] + delta[1]]
+  end
+
+ # will migrate methods from black pawn
+end
+
+class WhitePawn < Pawn
+  def initialize(symbol, color, position = nil, board = nil)
+    super
+    @move = [-1, 0]
+    #special method called "march", check if pawn is on row 1, if so
+    @capture = [[-1, 1], [-1, -1]]
+    # promotion !!!! bonus
+  end
+
+  def march
+    if position[0] == 6 && board[pawn_steps].nil? && board[offset(position, [-2,0])].nil?
+      return offset(position, [-2,0])
+    end
+  end
+
+end
+
+class BlackPawn < Pawn
+
+
+  def initialize(symbol, color, position = nil, board = nil)
+    super
+    @move = [1, 0]
+    #special method called "march", check if pawn is on row 1, if so
+    @capture = [[1, 1], [1, -1]]
+    # promotion !!!! bonus
+  end
+
+  def march
+    if position[0] == 1 && board[pawn_steps].nil? && board[offset(position, [2,0])].nil?
+      return offset(position, [2,0])
+    end
+  end
+
+
 
 end

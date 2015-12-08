@@ -7,3 +7,6 @@
 # Player class? << seems unnecessary
 # Log of all moves so far in the game << Allows saving a game
 # Make sure pieces stay on board
+# TODO
+=begin sliding pieces
+pawn
