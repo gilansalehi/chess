@@ -8,7 +8,7 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
-    @current_player = "White"
+    @current_player = "white"
     populate_board
   end
 
@@ -40,16 +40,17 @@ class Board
       selected_piece.position = fin
       switch_player
     else
+      # raise ChessError
       puts "Illegal Move!".red
       sleep(2)
     end
   end
 
   def switch_player
-    if current_player == "White"
-      @current_player = "Black"
-    elsif current_player == "Black"
-      @current_player = "White"
+    if current_player == "white"
+      @current_player = "black"
+    elsif current_player == "black"
+      @current_player = "white"
     end
   end
 

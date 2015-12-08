@@ -38,7 +38,7 @@ class Display
   end
 
   def render
-    system("clear")
+    # system("clear")
     puts "Select a piece with Space Bar"
 
     grid.each_with_index do |row, i|
@@ -73,14 +73,19 @@ class Display
       exit 0
     when :space
       # selected ? @selected = false : @selected = true
-      if selected == false # grabbing a piece
+      if selected == false && !board[cursor].nil? # grabbing a piece
         @selected = true
         @start = cursor
         # call a method where the piece highlights the sqaures it's allowed to move to
-      else #dropping a piece
+      elsif selected == true #dropping a piece
+
         # when selected becomes false, call the board.move method passing in start and fin
-        @selected = false
         board.move(start, cursor)
+        # rescue StandardError => e
+        #   puts e.message
+        #   @selected = false
+        #   retry
+        @selected = false
       end
     when :left, :right, :up, :down
       update_pos(MOVES[key])
