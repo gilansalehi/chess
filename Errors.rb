@@ -3,3 +3,9 @@ class ChessError < StandardError
     puts "Illegal Move"
   end
 end
+
+class CheatyFace < ChessError
+  def message
+    puts "NOT YO TURN, CHEATA"
+  end
+end

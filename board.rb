@@ -1,7 +1,7 @@
 require_relative 'display'
 require_relative 'piece'
 require 'colorize'
-
+require_relative 'Errors.rb'
 
 class Board
   attr_accessor :grid, :current_player
@@ -34,15 +34,14 @@ class Board
 
   def move(start, fin)
     selected_piece = self[start]
+
     if selected_piece.valid_moves.include?(fin)
       self[start] = nil
       self[fin] = selected_piece
       selected_piece.position = fin
       switch_player
     else
-      # raise ChessError
-      puts "Illegal Move!".red
-      sleep(2)
+      raise ChessError
     end
   end
 

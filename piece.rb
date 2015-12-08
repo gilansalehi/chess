@@ -11,8 +11,6 @@ class Piece
     @board = board
   end
 
-
-
   def to_s
     case color
     when :black

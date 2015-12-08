@@ -1,7 +1,9 @@
 require 'colorize'
 require 'io/console'
+require_relative 'Errors.rb'
 
 class Display
+
   attr_accessor :board, :cursor, :selected, :grid, :start
 
   KEYMAP = {
@@ -38,7 +40,7 @@ class Display
   end
 
   def render
-    # system("clear")
+    system("clear")
     puts "Select a piece with Space Bar"
 
     grid.each_with_index do |row, i|
@@ -65,6 +67,10 @@ class Display
   def get_input
     key = KEYMAP[read_char]
     handle_key(key)
+  rescue ChessError => e
+    puts e.message
+    @selected = false
+    retry
   end
 
   def handle_key(key)
@@ -74,17 +80,15 @@ class Display
     when :space
       # selected ? @selected = false : @selected = true
       if selected == false && !board[cursor].nil? # grabbing a piece
+        if board[cursor].color != board.current_player.to_sym
+          raise CheatyFace # piece of wrong color selected
+        end
         @selected = true
         @start = cursor
         # call a method where the piece highlights the sqaures it's allowed to move to
       elsif selected == true #dropping a piece
-
         # when selected becomes false, call the board.move method passing in start and fin
         board.move(start, cursor)
-        # rescue StandardError => e
-        #   puts e.message
-        #   @selected = false
-        #   retry
         @selected = false
       end
     when :left, :right, :up, :down
@@ -93,6 +97,7 @@ class Display
     else
       puts key
     end
+
   end
 
 
