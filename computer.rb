@@ -24,13 +24,12 @@ class ComputerPlayer
     end
 
     start = piece.position
-
     fin = piece.valid_moves.shuffle.first
     return [start, fin]
   end
 
   def play_move(board)
-    arr = pick_random_move(board)
+    arr = pick_random_move(board) # Goal: replace this line with a more complex algorithm
     board.move(arr[0], arr[1])
   end
 

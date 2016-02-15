@@ -3,7 +3,7 @@ require 'byebug'
 
 class Piece
 
-  attr_accessor :symbol, :color, :position, :board, :move_directions
+  attr_accessor :symbol, :color, :position, :board, :move_directions, :moved
 
   def initialize(color, position, board)
     @color = color
@@ -231,6 +231,14 @@ class WhitePawn < Pawn
     end
   end
 
+  def promote
+    if position[0] == 0
+      col = self.position[1]
+
+      board.grid[0][col] = Queen.new(:white, [0, col], board)
+    end
+  end
+
 end
 
 class BlackPawn < Pawn
@@ -249,6 +257,15 @@ class BlackPawn < Pawn
   def march
     if position[0] == 1 && board[pawn_steps].nil? && board[offset(position, [2,0])].nil?
       return offset(position, [2,0])
+    end
+  end
+
+  def promote
+    if position[0] == 7
+      col = self.position[1]
+
+      debugger
+      board.grid[7][col] = Queen.new(:black, [7, col], board)
     end
   end
 

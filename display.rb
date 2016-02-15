@@ -100,7 +100,6 @@ class Display
 
   end
 
-
   def read_char
     input = STDIN.getch
     # if input == "\e" then

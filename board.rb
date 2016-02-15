@@ -4,12 +4,14 @@ require 'colorize'
 require_relative 'Errors.rb'
 
 class Board
-  attr_accessor :grid, :current_player
+  attr_accessor :grid, :current_player, :eval, :white_castled, :black_castled
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
     @current_player = "white"
     @eval = 0 # this instance variable is for the computer to calculate optimal moves
+    @white_castled = false
+    @black_castled = false
     populate_board
   end
 
@@ -76,15 +78,21 @@ class Board
     end
   end
 
-  # def valid_moves(color)
-  #   legal_moves = {}
-  #   grid.flatten.compact.each do |square|
-  #     if square.color == color && (square.valid_moves.count > 0)
-  #       legal_moves[square.position] = square.valid_moves
-  #     end
-  #   end
-  #   legal_moves
-  # end
+  def create_piece(position, piece)
+    grid[position[0]][position[1]] = piece
+  end
+
+  def remove_piece(position)
+    grid[position[0]][position[1]] = nil
+  end
+
+  def check_for_promotions
+    grid.flatten.compact.each do |square|
+      if square.is_a?(Pawn)
+        square.promote
+      end
+    end
+  end
 
   def deep_dup
     duped_board = Board.new
