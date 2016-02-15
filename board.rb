@@ -9,6 +9,7 @@ class Board
   def initialize
     @grid = Array.new(8) { Array.new(8) }
     @current_player = "white"
+    @eval = 0 # this instance variable is for the computer to calculate optimal moves
     populate_board
   end
 
@@ -74,6 +75,16 @@ class Board
       square.color == color && (square.valid_moves.count > 0)
     end
   end
+
+  # def valid_moves(color)
+  #   legal_moves = {}
+  #   grid.flatten.compact.each do |square|
+  #     if square.color == color && (square.valid_moves.count > 0)
+  #       legal_moves[square.position] = square.valid_moves
+  #     end
+  #   end
+  #   legal_moves
+  # end
 
   def deep_dup
     duped_board = Board.new

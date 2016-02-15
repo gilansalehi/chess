@@ -1,6 +1,7 @@
 require_relative 'board.rb'
 require_relative 'piece.rb'
 require_relative 'display'
+require_relative 'computer.rb'
 
 class Game
 
@@ -11,11 +12,12 @@ class Game
     # @current_player = "White"
     @display = Display.new(board)
     # game log, load pieces, etc.?
+    @deep_blue = ComputerPlayer.new()
   end
 
   def play
     until board.checkmate?(:black) || board.checkmate?(:white)
-      play_turn
+      play_turn # MODIFY THIS SO COMPUTER MAKES MOVES FOR BLACK
     end
     if board.checkmate?(:black)
       puts "White wins!!"
@@ -31,12 +33,16 @@ class Game
     # original_grid = board.grid.dup
     current = board.current_player.dup
     display.render
-
-    until board.current_player != current
-      puts "Current player is #{board.current_player}"
-      display.get_input
+    if current == "white"
+      until board.current_player != current
+        puts "Current player is #{board.current_player}"
+        display.get_input
+        display.render
+        # retry before switching players in case player enters an illegal move
+      end
+    else
+      @deep_blue.play_move(board) # the computer will make moves as black.
       display.render
-      # retry before switching players in case player enters an illegal move
     end
 
   end
@@ -48,29 +54,3 @@ if __FILE__ == $PROGRAM_NAME
   game = Game.new
   game.play
 end
-
-#
-# if __FILE__ == $PROGRAM_NAME
-#   board = Board.new()
-#   board.populate_board
-#   test = Display.new(board)
-#   test.render
-#
-#   while true
-#     # test.get_input
-#     test.render
-#     board.grid.flatten.each do | square |
-#       puts "#{square.class} vmoves: #{square.valid_moves}" unless square.nil?
-#     end
-#     test.get_input
-#     if board.checkmate?(:black)
-#       puts "white wins "
-#       sleep(2)
-#     elsif board.checkmate?(:white)
-#       puts "black wins "
-#       sleep(2)
-#     end
-#   end
-#
-#
-# end

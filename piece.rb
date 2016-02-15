@@ -78,6 +78,7 @@ class SteppingPiece < Piece
     new_moves = move_directions.map do |dir| # takes current positions and returns array of adj positions
       [@position[0] + dir[0], @position[1] + dir[1]]
     end
+
     new_moves
   end
 end
@@ -97,6 +98,9 @@ class King < SteppingPiece
       [0, -1],
       [-1, -1]
     ]
+    @moved = false
+    @castled = false
+    @value = 1000000
   end
 
 end
@@ -116,6 +120,8 @@ class Knight < SteppingPiece
       [-1, -2],
       [-2, -1]
     ]
+    @moved = false
+    @value = 3
   end
 
 
@@ -133,6 +139,8 @@ class Rook < SlidingPiece
       [1, 0],
       [0, -1]
     ]
+    @moved = false
+    @value = 5
   end
 
 end
@@ -148,6 +156,8 @@ class Bishop < SlidingPiece
       [1, -1],
       [-1, 1]
     ]
+    @moved = false
+    @value = 3
   end
 
 end
@@ -167,6 +177,8 @@ class Queen < SlidingPiece
       [1, -1],
       [-1, 1]
     ]
+    @moved = false
+    @value = 9
   end
 
 end
@@ -208,6 +220,8 @@ class WhitePawn < Pawn
     @step = [-1, 0]
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[-1, 1], [-1, -1]]
+    @moved = false
+    @value = 1
     # promotion !!!! bonus
   end
 
@@ -227,6 +241,8 @@ class BlackPawn < Pawn
     @step = [1, 0]
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[1, 1], [1, -1]]
+    @moved = false
+    @value = 1
     # promotion !!!! bonus
   end
 
