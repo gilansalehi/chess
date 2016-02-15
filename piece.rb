@@ -3,7 +3,7 @@ require 'byebug'
 
 class Piece
 
-  attr_accessor :symbol, :color, :position, :board, :move_directions, :moved
+  attr_accessor :symbol, :color, :position, :board, :move_directions, :moved, :castled
   attr_reader :value
 
   def initialize(color, position, board)
@@ -36,7 +36,7 @@ class Piece
     # arr1, comes from subclass
     # select method that allows only empty squares on the board or enemy pieces
     # array modified
-    # hilight legal moves in rendering
+    # hilight legal moves in rendering?
     rough_moves.select do |pos| # filters out moves off board or onto friendly pieces
       pos.all? { |el| el < 8 && el >= 0 } &&
       (board[pos].nil? || board[pos].color != color)
@@ -102,6 +102,48 @@ class King < SteppingPiece
     @moved = false
     @castled = false
     @value = 1000000
+  end
+
+  def may_castle_kingside?
+    row = self.position[0]
+    color = self.color
+    return false if moved  # if the king hasn't moved
+    return false if board[([row, 7])].moved  # if the rook hasn't moved
+    return false unless board[([row, 5])] == nil && board[([row, 6])] == nil  # no pieces in the way
+    return false if board.in_check?(color)  # if the king is not in check
+    return false if move_into_check?([row, 5])  # and will not pass through check
+    return false if move_into_check?([row, 6])  # and will not end in check
+    return true
+  end
+
+  def may_castle_queenside?
+    row = self.position[0]
+    color = self.color
+    return false if moved  # if the king hasn't moved
+    return false if board[([row, 0])].moved  # if the rook hasn't moved
+    return false unless board[([row, 1])] == nil && board[([row, 2])] == nil && board[([row, 3])] == nil
+    return false if board.in_check?(color)  # if the king is not in check
+    return false if move_into_check?([row, 3])  # and will not pass through check
+    return false if move_into_check?([row, 2])  # and will not end in check
+    return true
+  end
+
+  def castle_kingside
+    row = self.position[0]
+    color = self.color
+    king_start, king_fin = [row, 4], [row, 6]
+    rook_start, rook_fin = [row, 7], [row, 5]
+    board.move!(king_start, king_fin)
+    board.move!(rook_start, rook_fin)
+  end
+
+  def castle_queenside
+    row = self.position[0]
+    color = self.color
+    king_start, king_fin = [row, 4], [row, 2]
+    rook_start, rook_fin = [row, 0], [row, 3]
+    board.move!(king_start, king_fin)
+    board.move!(rook_start, rook_fin)
   end
 
 end

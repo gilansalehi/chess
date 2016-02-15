@@ -12,8 +12,6 @@ class ComputerPlayer
 
   def pick_random_move(board)
     my_pieces = []
-    puts(blind_eval(board))
-    sleep(1)
 
     board.grid.flatten.compact.each do |square|
       my_pieces << square if square.color == :black
@@ -31,12 +29,26 @@ class ComputerPlayer
   end
 
   def play_move(board)
-    arr = pick_random_move(board) # Goal: replace this line with a more complex algorithm
-    board.move(arr[0], arr[1])
+    puts("thinking...")
+    board.children = []
+    calculate_move(board, 2)
+    # arr = pick_random_move(board) # Goal: replace this line with a more complex algorithm
+    arr = pick_best_move(board)
+    debugger
+    board.move!(arr[0], arr[1])
+    board.switch_player
+  end
+
+  def pick_best_move(board)
+    vals = board.children.map { |child| child.eval }
+    best_pos = board.children.select{ |child| child.eval == vals.min } # min because negative scores are good for black
+    debugger
+    return best_pos[0].previous_move
   end
 
   def evaluate(board)
-    if board.children
+
+    if board.children.length > 0
       vals = board.children.map { |child| child.eval }
       if board.current_player == "white"
         board.eval = vals.max # plus scores indicate good board states for white
@@ -60,20 +72,23 @@ class ComputerPlayer
   end
 
   def calculate_move(board, depth)
-    # board.valid_moves.each do |move|
-    #   # make the move
-    #   deep_board = board.deep_dup
-    #   deep_board.move!(position, destination)
-    #   deep_board.evaluate
-    #   # make every response
-    #   deep_board.valid_moves.each do |response|
-    #     double_deep_board = board.deep_dup
-    #     double_deep_board.move!(position, destination)
-    #     double.deep_board.evaluate
-    #   # evaluate the boards
-    #   # recursively call calcluate_move at depth-1 on the four most promising moves.
+    return blind_eval(board) if depth == 0 # base case; we've searched to the intended depth
 
-    # end
+    board.legal_moves.each do |move|
+      # make the move
+      deep_board = board.deep_dup
+      # debugger
+      position, destination = move # parallel assignment
+
+      deep_board.move!(position, destination)
+      deep_board.previous_move = [position, destination]
+      deep_board.switch_player
+      board.children << deep_board
+      calculate_move(deep_board, depth - 1) # reductive step
+
+      evaluate(deep_board)
+    end
+
   end
 
 end

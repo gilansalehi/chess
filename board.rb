@@ -4,7 +4,7 @@ require 'colorize'
 require_relative 'Errors.rb'
 
 class Board
-  attr_accessor :grid, :current_player, :eval, :white_castled, :black_castled
+  attr_accessor :grid, :current_player, :eval, :white_castled, :black_castled, :children, :previous_move
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
@@ -12,6 +12,8 @@ class Board
     @eval = 0 # this instance variable is for the computer to calculate optimal moves
     @white_castled = false
     @black_castled = false
+    @children = [] # so the computer can calculate move trees.
+    @previous_move = nil # so the computer can calculate move trees???
     populate_board
   end
 
@@ -38,10 +40,30 @@ class Board
   def move(start, fin)
     selected_piece = self[start]
 
+    if selected_piece.is_a?(King)
+      row = selected_piece.position[0]
+      if fin == [row, 6] && selected_piece.may_castle_kingside?
+        selected_piece.castle_kingside
+        selected_piece.moved = true
+        selected_piece.castled = true
+        current_player == "white" ? @white_castled = true : @black_castled = true
+        switch_player
+        return true
+      elsif fin == [row, 2] && selected_piece.may_castle_queenside?
+        selected_piece.castle_queenside
+        selected_piece.moved = true
+        selected_piece.castled = true
+        current_player == "white" ? @white_castled = true : @black_castled = true
+        switch_player
+        return true
+      end
+    end
+
     if selected_piece.valid_moves.include?(fin)
       self[start] = nil
       self[fin] = selected_piece
       selected_piece.position = fin
+      selected_piece.moved = true
       switch_player
     else
       raise ChessError
@@ -92,6 +114,19 @@ class Board
         square.promote
       end
     end
+  end
+
+  def legal_moves
+    moves = []
+    grid.flatten.compact.each do |piece|
+      if piece.color == current_player.to_sym
+        piece.valid_moves.each do |destination|
+          moves << [piece.position, destination]
+        end
+      end
+    end
+
+    moves
   end
 
   def deep_dup
