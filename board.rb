@@ -35,6 +35,7 @@ class Board
     self[start] = nil
     self[fin] = selected_piece
     selected_piece.position = fin
+    selected_piece.moved = true
   end
 
   def move(start, fin)
@@ -131,6 +132,9 @@ class Board
 
   def deep_dup
     duped_board = Board.new
+    duped_board.current_player = self.current_player
+    duped_board.white_castled = self.white_castled
+    duped_board.black_castled = self.black_castled
     (0..7).each do |row|
       (0..7).each do |col|
         square = self[[row, col]]

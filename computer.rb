@@ -77,16 +77,16 @@ class ComputerPlayer
     board.legal_moves.each do |move|
       # make the move
       deep_board = board.deep_dup
-      # debugger
       position, destination = move # parallel assignment
 
       deep_board.move!(position, destination)
       deep_board.previous_move = [position, destination]
       deep_board.switch_player
       board.children << deep_board
-      calculate_move(deep_board, depth - 1) # reductive step
+      calculate_move(deep_board, depth - 1) if blind_eval(deep_board) <= blind_eval(board) + 5 # reductive step
 
       evaluate(deep_board)
+      puts(move.to_s + " " + deep_board.eval.to_s + ", " + depth.to_s)
     end
 
   end

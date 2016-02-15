@@ -4,7 +4,6 @@ require 'byebug'
 class Piece
 
   attr_accessor :symbol, :color, :position, :board, :move_directions, :moved, :castled
-  attr_reader :value
 
   def initialize(color, position, board)
     @color = color
@@ -104,6 +103,12 @@ class King < SteppingPiece
     @value = 1000000
   end
 
+  def value
+    return 1000005 if castled
+    return 999995 if moved
+    return 1000000
+  end
+
   def may_castle_kingside?
     row = self.position[0]
     color = self.color
@@ -164,12 +169,16 @@ class Knight < SteppingPiece
       [-2, -1]
     ]
     @moved = false
-    @value = 3
+    @value = 30
   end
 
-
+  def value
+    return 28 unless moved
+    return 28 if position[0] == 0 || position[0] == 7
+    return 28 if position[1] == 0 || position[1] == 7
+    return 30
+  end
 end
-
 
 class Rook < SlidingPiece
 
@@ -183,9 +192,13 @@ class Rook < SlidingPiece
       [0, -1]
     ]
     @moved = false
-    @value = 5
+    @value = 50
   end
 
+  def value
+    return 52 unless moved
+    return 50
+  end
 end
 
 class Bishop < SlidingPiece
@@ -200,7 +213,12 @@ class Bishop < SlidingPiece
       [-1, 1]
     ]
     @moved = false
-    @value = 3
+    @value = 30
+  end
+
+  def value
+    return 29 unless moved
+    return 30
   end
 
 end
@@ -221,7 +239,12 @@ class Queen < SlidingPiece
       [-1, 1]
     ]
     @moved = false
-    @value = 9
+    @value = 90
+  end
+
+  def value
+    return 91 unless moved
+    return 90
   end
 
 end
@@ -264,7 +287,7 @@ class WhitePawn < Pawn
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[-1, 1], [-1, -1]]
     @moved = false
-    @value = 1
+    @value = 10
     # promotion !!!! bonus
   end
 
@@ -272,6 +295,11 @@ class WhitePawn < Pawn
     if position[0] == 6 && board[pawn_steps].nil? && board[offset(position, [-2,0])].nil?
       return offset(position, [-2,0])
     end
+  end
+
+  def value
+    return 15 if position[0] == 2 || position[0] == 1
+    return 10
   end
 
   def promote
@@ -293,7 +321,7 @@ class BlackPawn < Pawn
     #special method called "march", check if pawn is on row 1, if so
     @capture = [[1, 1], [1, -1]]
     @moved = false
-    @value = 1
+    @value = 10
     # promotion !!!! bonus
   end
 
@@ -303,11 +331,15 @@ class BlackPawn < Pawn
     end
   end
 
+  def value
+    return 15 if position[0] == 5 || position[0] == 6
+    return 10
+  end
+
   def promote
     if position[0] == 7
       col = self.position[1]
 
-      debugger
       board.grid[7][col] = Queen.new(:black, [7, col], board)
     end
   end
