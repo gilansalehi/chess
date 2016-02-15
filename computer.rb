@@ -12,6 +12,8 @@ class ComputerPlayer
 
   def pick_random_move(board)
     my_pieces = []
+    puts(blind_eval(board))
+    sleep(1)
 
     board.grid.flatten.compact.each do |square|
       my_pieces << square if square.color == :black
@@ -51,7 +53,7 @@ class ComputerPlayer
     white_score, black_score = 0, 0
 
     board.grid.flatten.compact.each do |square| #compact removes nil values
-      square.color == "white" ? white_score += square.value : black_score += square.value
+      square.color == :white ? white_score += square.value : black_score += square.value
     end
 
     return white_score - black_score

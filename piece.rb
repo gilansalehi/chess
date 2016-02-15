@@ -4,6 +4,7 @@ require 'byebug'
 class Piece
 
   attr_accessor :symbol, :color, :position, :board, :move_directions, :moved
+  attr_reader :value
 
   def initialize(color, position, board)
     @color = color
