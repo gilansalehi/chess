@@ -298,6 +298,7 @@ class WhitePawn < Pawn
   end
 
   def value
+    return 12 if position == [6, 5]
     return 15 if position[0] == 2 || position[0] == 1
     return 10
   end
@@ -332,6 +333,7 @@ class BlackPawn < Pawn
   end
 
   def value
+    return 17 if position == [1, 5]
     return 15 if position[0] == 5 || position[0] == 6
     return 10
   end

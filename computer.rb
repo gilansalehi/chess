@@ -46,6 +46,11 @@ class ComputerPlayer
     # this method will assign a score to a board state without considering future moves
     white_score, black_score = 0, 0
 
+    if board.checkmate?(board.current_player)
+      return 10000000 if board.current_player == "black"
+      return -10000000 if board.current_player == "white"
+    end
+
     board.grid.flatten.compact.each do |square| #compact removes nil values
       square.color == :white ? white_score += square.value : black_score += square.value
     end
@@ -74,8 +79,7 @@ class ComputerPlayer
     populate_children(board)
 
     board.children.each do |child|
-      calculate_move(child, min_depth, max_depth - 1) if child.check
-      calculate_move(child, min_depth, max_depth - 1) if child.capture
+      calculate_move(child, min_depth, max_depth - 1) if child.check || child.capture
       calculate_move(child, min_depth - 1, max_depth - 1) # non-check/captures
 
       evaluate(child) # necessary?
