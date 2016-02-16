@@ -10,51 +10,33 @@ class ComputerPlayer
     @eval = 0 #score for white and for black
   end
 
-  def pick_random_move(board)
-    my_pieces = []
-
-    board.grid.flatten.compact.each do |square|
-      my_pieces << square if square.color == :black
-    end
-
-    piece = my_pieces.shuffle.first
-
-    until piece.valid_moves.length > 0
-      piece = my_pieces.shuffle.first
-    end
-
-    start = piece.position
-    fin = piece.valid_moves.shuffle.first
-    return [start, fin]
-  end
-
   def play_move(board)
     puts("thinking...")
     board.children = []
-    calculate_move(board, 2)
-    # arr = pick_random_move(board) # Goal: replace this line with a more complex algorithm
+    # pick a random move; then look for a better one?
+
+    calculate_move(board, 1, 3) # populates and evaluates children of current position.
+
+    # think_ahead_2(board, 2)
+
     arr = pick_best_move(board)
-    debugger
+
     board.move!(arr[0], arr[1])
     board.switch_player
   end
 
   def pick_best_move(board)
     vals = board.children.map { |child| child.eval }
-    best_pos = board.children.select{ |child| child.eval == vals.min } # min because negative scores are good for black
-    debugger
+    best_pos = board.children.shuffle.select{ |child| child.eval == vals.min } # min because negative scores are good for black
+    # debugger
     return best_pos[0].previous_move
   end
 
   def evaluate(board)
-
     if board.children.length > 0
       vals = board.children.map { |child| child.eval }
-      if board.current_player == "white"
-        board.eval = vals.max # plus scores indicate good board states for white
-      else
-        board.eval = vals.min # minus indicates good board states for black, aka the computer
-      end
+      # minmax tree search; assumes white makes best move
+      board.current_player == "white" ? board.eval = vals.max : board.eval = vals.min
     else
       board.eval = blind_eval(board)
     end
@@ -71,24 +53,53 @@ class ComputerPlayer
     return white_score - black_score
   end
 
-  def calculate_move(board, depth)
-    return blind_eval(board) if depth == 0 # base case; we've searched to the intended depth
-
+  def populate_children(board)
     board.legal_moves.each do |move|
-      # make the move
-      deep_board = board.deep_dup
+      deep_board = board.deep_dup # copy the board
       position, destination = move # parallel assignment
+      deep_board.capture = true unless destination.empty?
+      deep_board.move!(position, destination) # make the move
 
-      deep_board.move!(position, destination)
-      deep_board.previous_move = [position, destination]
+      deep_board.previous_move = [position, destination] # store the move
       deep_board.switch_player
+      deep_board.check = true if in_check?(deep_board.current_player)
+      deep_board.eval = blind_eval(deep_board)
       board.children << deep_board
-      calculate_move(deep_board, depth - 1) if blind_eval(deep_board) <= blind_eval(board) + 5 # reductive step
-
-      evaluate(deep_board)
-      puts(move.to_s + " " + deep_board.eval.to_s + ", " + depth.to_s)
     end
-
   end
+
+  def calculate_move(board, min_depth, max_depth)
+    return blind_eval(board) if min_depth == 0 || max_depth == 0
+
+    populate_children(board)
+
+    board.children.each do |child|
+      calculate_move(child, min_depth, max_depth - 1) if child.check
+      calculate_move(child, min_depth, max_depth - 1) if child.capture
+      calculate_move(child, min-depth -1, max_depth - 1) # non-check/captures
+
+      evaluate(child) # necessary?
+    end
+    evaluate(board) # necessary?
+  end
+
+  # def think_ahead_2(board, depth)
+  #   return blind_eval(board) if depth == 0 # base case; we've searched to the intended depth
+  #
+  #   board.legal_moves.each do |move|
+  #     # make the move
+  #     deep_board = board.deep_dup
+  #     position, destination = move # parallel assignment
+  #
+  #     deep_board.move!(position, destination)
+  #     deep_board.previous_move = [position, destination]
+  #     deep_board.switch_player
+  #     board.children << deep_board
+  #     calculate_move(deep_board, depth - 1) # reductive step
+  #
+  #     evaluate(deep_board)
+  #   end
+  # #
+  # # end
 
 end

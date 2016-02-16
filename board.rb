@@ -4,7 +4,8 @@ require 'colorize'
 require_relative 'Errors.rb'
 
 class Board
-  attr_accessor :grid, :current_player, :eval, :white_castled, :black_castled, :children, :previous_move
+  attr_accessor :grid, :current_player, :eval, :white_castled, :black_castled
+  attr_accessor :capture, :check, :children, :previous_move
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
@@ -13,7 +14,9 @@ class Board
     @white_castled = false
     @black_castled = false
     @children = [] # so the computer can calculate move trees.
-    @previous_move = nil # so the computer can calculate move trees???
+    @previous_move = nil # so the computer can calculate move trees
+    @capture = false # for computer to calculate captures
+    @check = false # for computer to calculate checks
     populate_board
   end
 
