@@ -62,7 +62,7 @@ class ComputerPlayer
 
       deep_board.previous_move = [position, destination] # store the move
       deep_board.switch_player
-      deep_board.check = true if in_check?(deep_board.current_player)
+      deep_board.check = true if deep_board.in_check?(deep_board.current_player)
       deep_board.eval = blind_eval(deep_board)
       board.children << deep_board
     end
@@ -76,7 +76,7 @@ class ComputerPlayer
     board.children.each do |child|
       calculate_move(child, min_depth, max_depth - 1) if child.check
       calculate_move(child, min_depth, max_depth - 1) if child.capture
-      calculate_move(child, min-depth -1, max_depth - 1) # non-check/captures
+      calculate_move(child, min_depth - 1, max_depth - 1) # non-check/captures
 
       evaluate(child) # necessary?
     end
