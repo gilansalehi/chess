@@ -11,8 +11,8 @@ class Board
     @grid = Array.new(8) { Array.new(8) }
     @current_player = "white"
     @eval = 0 # this instance variable is for the computer to calculate optimal moves
-    @white_castled = false
-    @black_castled = false
+    # @white_castled = false
+    # @black_castled = false
     @children = [] # so the computer can calculate move trees.
     @previous_move = nil # so the computer can calculate move trees
     @capture = false # for computer to calculate captures
@@ -21,12 +21,14 @@ class Board
   end
 
   def[](pos)
-    row,col = pos
-    grid[row][col]
+    row = pos[0]
+    col = pos[1]
+    @grid[row][col]
   end
 
   def[]=(pos, mark)
-    row,col = pos
+    row = pos[0]
+    col = pos[1]
     @grid[row][col] = mark
   end
 
@@ -104,22 +106,6 @@ class Board
     end
   end
 
-  def create_piece(position, piece)
-    grid[position[0]][position[1]] = piece
-  end
-
-  def remove_piece(position)
-    grid[position[0]][position[1]] = nil
-  end
-
-  def check_for_promotions
-    grid.flatten.compact.each do |square|
-      if square.is_a?(Pawn)
-        square.promote
-      end
-    end
-  end
-
   def legal_moves
     moves = []
     grid.flatten.compact.each do |piece|
@@ -136,8 +122,6 @@ class Board
   def deep_dup
     duped_board = Board.new
     duped_board.current_player = self.current_player
-    duped_board.white_castled = self.white_castled
-    duped_board.black_castled = self.black_castled
     (0..7).each do |row|
       (0..7).each do |col|
         square = self[[row, col]]

@@ -243,7 +243,7 @@ class Queen < SlidingPiece
   end
 
   def value
-    return 91 unless moved
+    return 93 unless moved
     return 90
   end
 

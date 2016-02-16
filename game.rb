@@ -17,8 +17,7 @@ class Game
 
   def play
     until board.checkmate?(:black) || board.checkmate?(:white)
-      play_turn # MODIFY THIS SO COMPUTER MAKES MOVES FOR BLACK
-      board.check_for_promotions
+      play_turn
     end
     if board.checkmate?(:black)
       puts "White wins!!"
