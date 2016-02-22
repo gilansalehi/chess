@@ -1,5 +1,5 @@
 require_relative 'display'
-require_relative 'piece'
+require_relative 'pieces'
 require 'colorize'
 require_relative 'Errors.rb'
 
@@ -10,13 +10,11 @@ class Board
   def initialize
     @grid = Array.new(8) { Array.new(8) }
     @current_player = "white"
-    @eval = 0 # this instance variable is for the computer to calculate optimal moves
-    # @white_castled = false
-    # @black_castled = false
-    @children = [] # so the computer can calculate move trees.
-    @previous_move = nil # so the computer can calculate move trees
-    @capture = false # for computer to calculate captures
-    @check = false # for computer to calculate checks
+    @eval = 0
+    @children = []
+    @previous_move = nil
+    @capture = false
+    @check = false
     populate_board
   end
 
@@ -33,9 +31,6 @@ class Board
   end
 
   def move!(start, fin)
-    # raise "no piece there" if self[start].nil?
-    # raise "invalid move" if #it's an invalid move!
-    # selected_piece = self[start]
     selected_piece = self[start]
     self[start] = nil
     self[fin] = selected_piece
@@ -86,13 +81,11 @@ class Board
 
 
   def in_check?(color)
-    # finds position of the King of the given color
     pos = nil
     grid.flatten.each do |square|
       pos = square.position if square.is_a?(King) && square.color == color
     end
 
-    #checks legal moves of enemy pieces to see if they contain the King's pos.
     grid.flatten.compact.any? do |square|
       return true if square.color != color && square.moves.include?(pos)
     end
@@ -100,7 +93,6 @@ class Board
   end
 
   def checkmate?(color)
-    # checks each square for legal moves.  If none have legal moves, returns true
     grid.flatten.compact.none? do |square|
       square.color == color && (square.valid_moves.count > 0)
     end
@@ -140,12 +132,11 @@ class Board
   def populate_board
     row_of_pieces(0, :black)
     row_of_pieces(7, :white)
-    # setup black's back row
-    grid[1].each_index do |i| # changed from each_with_index
-      grid[1][i] = BlackPawn.new(:black, [1,i], self) # and position
+    grid[1].each_index do |i|
+      grid[1][i] = BlackPawn.new(:black, [1,i], self)
     end
     grid[6].each_index do |i|
-      grid[6][i] = WhitePawn.new(:white, [6, i], self) # and position
+      grid[6][i] = WhitePawn.new(:white, [6, i], self)
     end
   end
 

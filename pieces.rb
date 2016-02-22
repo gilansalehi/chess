@@ -1,5 +1,4 @@
 require 'colorize'
-require 'byebug'
 
 class Piece
 
@@ -20,27 +19,21 @@ class Piece
     end
   end
 
-  def valid_moves # rejects any move that puts self into check
+  def valid_moves
     moves.reject { |move| move_into_check?(move) }
   end
 
   def move_into_check?(destination)
-    # true if pieces move will result in putting self in check
     deep_board = board.deep_dup
     deep_board.move!(position, destination)
     deep_board.in_check?(color)
   end
 
   def moves
-    # arr1, comes from subclass
-    # select method that allows only empty squares on the board or enemy pieces
-    # array modified
-    # hilight legal moves in rendering?
-    rough_moves.select do |pos| # filters out moves off board or onto friendly pieces
+    rough_moves.select do |pos|
       pos.all? { |el| el < 8 && el >= 0 } &&
       (board[pos].nil? || board[pos].color != color)
     end
-    # return final move array
   end
 
 end
@@ -57,14 +50,13 @@ class SlidingPiece < Piece
     @move_directions.each do | dir |
       last_position = position
       next_pos = [last_position[0] + dir[0], last_position[1] + dir[1]]
-      # debugger
-      while on_board?(next_pos) && board[next_pos].nil?  # write an on_board method
+
+      while on_board?(next_pos) && board[next_pos].nil?
         legal_moves << next_pos
         last_position = next_pos
         next_pos = [last_position[0] + dir[0], last_position[1] + dir[1]]
       end
-      legal_moves << next_pos  # this covers capture but might include illegal
-      #moves---filter out in move method in Piece
+      legal_moves << next_pos
     end
 
     legal_moves
@@ -75,7 +67,7 @@ end
 class SteppingPiece < Piece
 
   def rough_moves
-    new_moves = move_directions.map do |dir| # takes current positions and returns array of adj positions
+    new_moves = move_directions.map do |dir|
       [@position[0] + dir[0], @position[1] + dir[1]]
     end
 
@@ -112,24 +104,24 @@ class King < SteppingPiece
   def may_castle_kingside?
     row = self.position[0]
     color = self.color
-    return false if moved  # if the king hasn't moved
-    return false if board[([row, 7])].moved  # if the rook hasn't moved
-    return false unless board[([row, 5])] == nil && board[([row, 6])] == nil  # no pieces in the way
-    return false if board.in_check?(color)  # if the king is not in check
-    return false if move_into_check?([row, 5])  # and will not pass through check
-    return false if move_into_check?([row, 6])  # and will not end in check
+    return false if moved
+    return false if board[([row, 7])].moved
+    return false unless board[([row, 5])] == nil && board[([row, 6])] == nil
+    return false if board.in_check?(color)
+    return false if move_into_check?([row, 5])
+    return false if move_into_check?([row, 6])
     return true
   end
 
   def may_castle_queenside?
     row = self.position[0]
     color = self.color
-    return false if moved  # if the king hasn't moved
-    return false if board[([row, 0])].moved  # if the rook hasn't moved
+    return false if moved
+    return false if board[([row, 0])].moved
     return false unless board[([row, 1])] == nil && board[([row, 2])] == nil && board[([row, 3])] == nil
-    return false if board.in_check?(color)  # if the king is not in check
-    return false if move_into_check?([row, 3])  # and will not pass through check
-    return false if move_into_check?([row, 2])  # and will not end in check
+    return false if board.in_check?(color)
+    return false if move_into_check?([row, 3])
+    return false if move_into_check?([row, 2])
     return true
   end
 
@@ -284,11 +276,9 @@ class WhitePawn < Pawn
     super
     @symbol = "\u265F"
     @step = [-1, 0]
-    #special method called "march", check if pawn is on row 1, if so
     @capture = [[-1, 1], [-1, -1]]
     @moved = false
     @value = 10
-    # promotion !!!! bonus
   end
 
   def march
@@ -319,11 +309,9 @@ class BlackPawn < Pawn
     super
     @symbol = "\u265F"
     @step = [1, 0]
-    #special method called "march", check if pawn is on row 1, if so
     @capture = [[1, 1], [1, -1]]
     @moved = false
     @value = 10
-    # promotion !!!! bonus
   end
 
   def march

@@ -6,6 +6,6 @@ end
 
 class CheatyFace < ChessError
   def message
-    puts "NOT YO TURN, CHEATA"
+    puts "That's not your piece"
   end
 end

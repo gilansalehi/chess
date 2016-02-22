@@ -78,22 +78,18 @@ class Display
     when :ctrl_c
       exit 0
     when :space
-      # selected ? @selected = false : @selected = true
-      if selected == false && !board[cursor].nil? # grabbing a piece
+      if selected == false && !board[cursor].nil?
         if board[cursor].color != board.current_player.to_sym
-          raise CheatyFace # piece of wrong color selected
+          raise CheatyFace
         end
         @selected = true
         @start = cursor
-        # call a method where the piece highlights the sqaures it's allowed to move to
-      elsif selected == true #dropping a piece
-        # when selected becomes false, call the board.move method passing in start and fin
+      elsif selected == true
         board.move(start, cursor)
         @selected = false
       end
     when :left, :right, :up, :down
       update_pos(MOVES[key])
-      # nil # why nil?
     else
       puts key
     end
@@ -102,13 +98,6 @@ class Display
 
   def read_char
     input = STDIN.getch
-    # if input == "\e" then
-    #   input << STDIN.read_nonblock(3) rescue nil
-    #   input << STDIN.read_nonblock(2) rescue nil
-    # end
-    # ensure
-    # STDIN.echo = true
-    # STDIN.cooked!
     input
   end
 
